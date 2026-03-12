@@ -14,7 +14,7 @@ def connect_to_demo_db() -> WeaviateClient:
     For queries only.
     This database instance has the necessary data loaded.
     """
-    client = weaviate.connect_to_wcs(
+    client = weaviate.connect_to_weaviate_cloud(
         cluster_url=os.getenv("DEMO_WEAVIATE_URL"),                                     # Demo server URL,
         auth_credentials=weaviate.auth.AuthApiKey(os.getenv("DEMO_WEAVIATE_RO_KEY")),   # Demo server read-only API key
 
@@ -24,6 +24,22 @@ def connect_to_demo_db() -> WeaviateClient:
     )  
     return client
     
+
+
+def connect_to_demo_db_goog() -> WeaviateClient:
+    """
+    Helper function to connect to your own Weaviate Cloud instance
+    configured with Gemini (text2vec-google) as the vectorizer.
+    Used as a Gemini-based alternative to the demo database.
+    """
+    client = weaviate.connect_to_weaviate_cloud(
+        cluster_url=os.getenv("MY_WEAVIATE_URL"),
+        auth_credentials=weaviate.auth.AuthApiKey(os.getenv("MY_WEAVIATE_KEY")),
+
+        # Gemini API key for vectorization and generative queries
+        headers={"X-Goog-Studio-Api-Key": os.getenv("GEMINI_APIKEY")},
+    )
+    return client
 
 
 def connect_to_my_db() -> WeaviateClient:

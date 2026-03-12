@@ -6,8 +6,8 @@ client = utils.connect_to_demo_db()  # Connect to the demo database
 movies = client.collections.get("Movie")
 
 response = movies.query.bm25(  # Keyword search for the word "love"
-    query="love",
-    limit=3,
+    query="AI",
+    limit=2,
     return_metadata=wvc.query.MetadataQuery(score=True),
 )
 

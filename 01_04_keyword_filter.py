@@ -5,7 +5,7 @@ client = utils.connect_to_demo_db()  # Connect to the demo database
 
 movies = client.collections.get("Movie")
 
-filter = Filter.by_property("description").like("love")  # Define the filter - look for the word "love" in the description
+filter = Filter.by_property("description").like("forget*")  # Define the filter - look for the word "love" in the description
 response = movies.query.fetch_objects(
     filters=filter,
     limit=3
