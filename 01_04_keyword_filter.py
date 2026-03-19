@@ -1,7 +1,7 @@
 import utils
 from weaviate.classes.query import Filter
 
-client = utils.connect_to_demo_db()  # Connect to the demo database
+client = utils.connect_to_demo_db_goog()  # Connect to the demo database
 
 movies = client.collections.get("Movie")
 

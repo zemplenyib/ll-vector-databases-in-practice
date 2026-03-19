@@ -2,13 +2,18 @@ import utils
 import weaviate.classes as wvc
 from weaviate.util import generate_uuid5
 import pandas as pd
+import time
+
+BATCH_SIZE = 100
+RPM_LIMIT = 100
 
 movie_df = pd.read_csv("data/movies_data.csv")  # Load the data
 
 client = utils.connect_to_my_db()  # Connect to our own database
 movies = client.collections.get("Movie")   # Get the Movie collection
 
-
+config = movies.config.get()
+print(f"Model: {config.vector_config}")
 movie_objs = list()
 for i, row in movie_df.iterrows():
     props = {
@@ -27,9 +32,16 @@ for i, row in movie_df.iterrows():
     )
     movie_objs.append(data_obj)
 
-response = movies.data.insert_many(movie_objs)
 
-print(f"Insertion complete with {len(response.all_responses)} objects.")
-print(f"Insertion errors: {len(response.errors)}.")
+for i in range(0, len(movie_objs), BATCH_SIZE):
+    batch = movie_objs[i:i+BATCH_SIZE]
+    response = movies.data.insert_many(batch)
+
+    print(f"Insertion complete with {len(response.all_responses)} objects.")
+    print(f"Insertion errors: {len(response.errors)}.")
+
+    if i + BATCH_SIZE < len(movie_objs):
+        time.sleep(60)
+
 
 client.close()

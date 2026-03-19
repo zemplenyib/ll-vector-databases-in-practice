@@ -10,8 +10,8 @@ client.collections.delete("Movie")
 reviews = client.collections.create(
     name="Review",
 
-    vectorizer_config=wvc.config.Configure.Vectorizer.text2vec_openai(),    # Set the vectorizer
-    generative_config=wvc.config.Configure.Generative.openai(),             # Set the generative model
+    vector_config=wvc.config.Configure.Vectors.text2vec_google_gemini(),    # Set the vectorizer
+    generative_config=wvc.config.Configure.Generative.google_gemini(model="gemini-3.1-flash-lite"),             # Set the generative model
 
     # Define the properties of the collection
     properties=[
@@ -28,8 +28,8 @@ movies = client.collections.create(
     name="Movie",
 
     # Set modules to be used
-    vectorizer_config=wvc.config.Configure.Vectorizer.text2vec_openai(),    # Set the vectorizer module
-    generative_config=wvc.config.Configure.Generative.openai(),             # Set the generative module
+    vector_config=wvc.config.Configure.Vectors.text2vec_google_gemini(),    # Set the vectorizer module
+    generative_config=wvc.config.Configure.Generative.google_gemini(model="gemini-3.1-flash-lite"),             # Set the generative module
 
     # Define the properties of the collection
     properties=[

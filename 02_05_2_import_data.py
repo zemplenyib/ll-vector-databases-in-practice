@@ -2,6 +2,19 @@ import utils
 import weaviate.classes as wvc
 from weaviate.util import generate_uuid5
 import pandas as pd
+import time
+
+BATCH_SIZE = 100
+def insert_in_batch(collection, objs, name: str):
+    for i in range(0, len(objs), BATCH_SIZE):
+        batch = objs[i:i+BATCH_SIZE]
+        response = collection.data.insert_many(batch)
+
+        print(f"Insertion complete with {len(response.uuids)} objects for '{name}' collection.")
+        print(f"Insertion errors: {len(response.errors)}.")
+
+        if i + BATCH_SIZE < len(objs):
+            time.sleep(60)
 
 client = utils.connect_to_my_db()  # Connect to our own database
 
@@ -9,7 +22,6 @@ movies = client.collections.get("Movie")
 reviews = client.collections.get("Review")
 
 movie_df = pd.read_csv("data/movies_data.csv")
-
 
 # Import reviews first
 review_objs = list()
@@ -24,11 +36,9 @@ for i, row in movie_df.iterrows():
             data_obj = wvc.data.DataObject(properties=props, uuid=review_uuid)
             review_objs.append(data_obj)
 
-response = reviews.data.insert_many(review_objs)
-
-print(f"Insertion complete with {len(response.all_responses)} objects.")
-print(f"Insertion errors: {len(response.errors)}.")
-
+insert_in_batch(reviews, review_objs, "review")
+# Wait 60s before next collection
+time.sleep(60)
 
 # Import movies
 movie_objs = list()
@@ -58,9 +68,6 @@ for i, row in movie_df.iterrows():
     )
     movie_objs.append(data_obj)
 
-response = movies.data.insert_many(movie_objs)
-
-print(f"Insertion complete with {len(response.all_responses)} objects.")
-print(f"Insertion errors: {len(response.errors)}.")
+insert_in_batch(movies, movie_objs, "movies")
 
 client.close()

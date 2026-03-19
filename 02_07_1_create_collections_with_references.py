@@ -14,8 +14,8 @@ reviews = client.collections.create(
     name="Review",
 
     # Set modules to be used
-    vectorizer_config=wvc.config.Configure.Vectorizer.text2vec_openai(),    # Set the vectorizer
-    generative_config=wvc.config.Configure.Generative.openai(),             # Set the generative model
+    vector_config=wvc.config.Configure.Vectors.text2vec_google_gemini(),    # Set the vectorizer
+    generative_config=wvc.config.Configure.Generative.google_gemini(model="gemini-3.1-flash-lite"),             # Set the generative model
     # Could also explicitly set the model, e.g.:
     # generative_config=wvc.config.Configure.Generative.openai(model="gpt-4-1106-preview"),
 
@@ -34,8 +34,8 @@ movies = client.collections.create(
     name="Movie",
 
     # Set modules to be used
-    vectorizer_config=wvc.config.Configure.Vectorizer.text2vec_openai(),    # Set the vectorizer module
-    generative_config=wvc.config.Configure.Generative.openai(),             # Set the generative module
+    vector_config=wvc.config.Configure.Vectors.text2vec_google_gemini(),    # Set the vectorizer
+    generative_config=wvc.config.Configure.Generative.google_gemini(model="gemini-3.1-flash-lite"),             # Set the generative model
 
     # Define the properties of the collection
     properties=[
@@ -84,6 +84,27 @@ movies = client.collections.create(
 # Add a reference property with name "forMovie" that points to the "Movie" collection
 # ====================================================================================================
 # YOUR CODE GOES HERE
+synopses = client.collections.create(
+    name = "Synopsis",
+
+    # Set modules to be used
+    vector_config=wvc.config.Configure.Vectors.text2vec_google_gemini(),    # Set the vectorizer
+    generative_config=wvc.config.Configure.Generative.google_gemini(model="gemini-3.1-flash-lite"),             # Set the generative model
+
+    properties=[
+        wvc.config.Property(
+            name="body",
+            data_type=wvc.config.DataType.TEXT
+        )
+    ],
+
+    references=[
+        wvc.config.ReferenceProperty(
+            name="forMovie",
+            target_collection="Movie"
+        )
+    ]
+)
 
 # ====================================================================================================
 # Add a reference property to the "Movie" collection with name "hasSynopsis".
@@ -91,5 +112,11 @@ movies = client.collections.create(
 # Hint: use the "movies.config.add_reference" method
 # ====================================================================================================
 # YOUR CODE GOES HERE
+movies.config.add_reference(
+    wvc.config.ReferenceProperty(
+        name="hasSynopsis",
+        target_collection="Synopsis"
+    )
+)
 
 client.close()
