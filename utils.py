@@ -48,16 +48,16 @@ def connect_to_my_db() -> WeaviateClient:
     To be used for data loading as well as queries.
     """
 
-    client = weaviate.connect_to_wcs(
+    client = weaviate.connect_to_weaviate_cloud(
         # Your Weaviate URL - Edit this to match your own Weaviate instance
-        cluster_url="<YOUR_WEAVIATE_URL>",
+        cluster_url=os.getenv("MY_SECOND_WEAVIATE_URL"),
 
         # Your Weaviate API Key - Edit this to match your own Weaviate instance
-        auth_credentials=weaviate.auth.AuthApiKey("<YOUR_WEAVIATE_API_KEY>"),
+        auth_credentials=weaviate.auth.AuthApiKey(os.getenv("MY_SECOND_WEAVIATE_KEY")),
 
         # OpenAI API key for queries that require it
         # Edit this to provide your own
-        headers={"X-OpenAI-Api-Key": os.getenv("OPENAI_APIKEY")},
+        headers={"X-Goog-Studio-Api-Key": os.getenv("GEMINI_APIKEY")},
     )
 
     # # Or use a local instance - e.g. with Docker

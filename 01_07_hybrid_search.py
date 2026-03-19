@@ -1,7 +1,7 @@
 import utils
 import weaviate.classes as wvc
 
-client = utils.connect_to_demo_db()  # Connect to the demo database
+client = utils.connect_to_demo_db_goog()  # Connect to the demo database
 
 movies = client.collections.get("Movie")
 
@@ -19,7 +19,7 @@ for o in response.objects:
     print()
 
 
-alpha = 0  # Effectively a keyword search
+alpha = 0.5  # Effectively a keyword search
 response = movies.query.hybrid(
     query="stellar",
     limit=3,
