@@ -3,8 +3,8 @@ import streamlit as st
 import weaviate.classes as wvc
 from weaviate.util import generate_uuid5
 
-client = utils.connect_to_demo_db()     # Connect to the demo database
-# client = utils.connect_to_my_db()     # You can also connect to your own database
+#client = utils.connect_to_demo_db()     # Connect to the demo database
+client = utils.connect_to_my_db()     # You can also connect to your own database
 
 try:  # Wrap everything in a try-finally block to ensure the connection is closed
     movies = client.collections.get("Movie")

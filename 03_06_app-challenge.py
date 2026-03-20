@@ -55,6 +55,8 @@ try:  # Wrap everything in a try-finally block to ensure the connection is close
         movie_filter = (
             wvc.query.Filter.by_property("rating").greater_or_equal(value_range[0])
             & wvc.query.Filter.by_property("rating").less_or_equal(value_range[1])
+            & wvc.query.Filter.by_property("year").greater_or_equal(year_min)
+            & wvc.query.Filter.by_property("year").less_or_equal(year_max)
         )
         synopsis_xref = wvc.query.QueryReference(
             link_on="hasSynopsis", return_properties=["body"]
@@ -64,6 +66,13 @@ try:  # Wrap everything in a try-finally block to ensure the connection is close
 
             if search_type == "Vector":
                 response = movies.query.near_text(
+                    query=query_string,
+                    filters=movie_filter,
+                    limit=5,
+                    return_references=[synopsis_xref],
+                )
+            elif search_type == "Keyword":
+                response = movies.query.bm25(
                     query=query_string,
                     filters=movie_filter,
                     limit=5,
@@ -116,6 +125,9 @@ try:  # Wrap everything in a try-finally block to ensure the connection is close
                     wvc.query.QueryReference(
                         link_on="hasSynopsis", return_properties=["body"]
                     ),
+                    wvc.query.QueryReference(
+                        link_on="hasReview", return_properties=["body"]
+                    ),
                 ],
             )
 
@@ -133,6 +145,10 @@ try:  # Wrap everything in a try-finally block to ensure the connection is close
 
             with st.expander("See synopsis"):
                 st.write(movie.references["hasSynopsis"].objects[0].properties["body"])
+            with st.expander("See reviews"):
+                for i,r in enumerate(movie.references["hasReview"].objects):
+                    st.write(f"**Review {i+1}**")
+                    st.write(r.properties["body"])
 
 
     with rec_tab:
