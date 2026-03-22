@@ -3,6 +3,7 @@ import weaviate.classes as wvc
 from weaviate.util import generate_uuid5
 from pathlib import Path
 import json
+from insert_in_batch import insert_in_batch
 
 client = utils.connect_to_my_db()  # Connect to our own database
 
@@ -18,19 +19,65 @@ for k, v in chunked_pages.items():
 # title (text)
 # chunk (text)
 # chunk_number (int)
+if client.collections.exists("WikiChunk"):
+    print("Collection already exists")
+    client.collections.delete("WikiChunk")
+
+client.collections.create(
+    name="WikiChunk",
+    vector_config=wvc.config.Configure.Vectors.text2vec_google_gemini(),    # Set the vectorizer module
+    generative_config=wvc.config.Configure.Generative.google_gemini(model="gemini-3.1-flash-lite"),  # Set the generative module
+    properties=[
+        wvc.config.Property(
+            # Set the name of the property
+            name="title",
+            # Set the data type of the property
+            data_type=wvc.config.DataType.TEXT,
+        ),
+        wvc.config.Property(
+            # Set the name of the property
+            name="chunk",
+            # Set the data type of the property
+            data_type=wvc.config.DataType.TEXT,
+        ),
+        wvc.config.Property(
+            # Set the name of the property
+            name="chunk_number",
+            # Set the data type of the property
+            data_type=wvc.config.DataType.INT,
+        )
+    ]
+)
 
 
 # Get the collection
-
+wikiChunk = client.collections.get("WikiChunk")
 
 # Insert the chunks
 # Iterate over the chunked pages
-
+for page, chunks in chunked_pages.items():
     # Create a list of DataObjects
-
+    data_objects = list()
     # Iterate over the chunks with enumerate()
     # Use the index as the chunk number
     # How would you generate a unique UUID for each chunk?
+    for i, chunk in enumerate(chunks):
+        props = {
+            "title": page,
+            "chunk": chunk,
+            "chunk_number": i
+        }
+        uuid = generate_uuid5(i, namespace=page)
+        data_obj = wvc.data.DataObject(
+            properties=props,
+            uuid=uuid,
+        )
+        data_objects.append(data_obj)
 
     # Insert the chunks for that document
+    try:
+        insert_in_batch(wikiChunk, data_objects, "WikiChunk")
+    except:
+        client.close()
 
+client.close()

@@ -9,13 +9,18 @@ import argparse
 def main():
     parser = argparse.ArgumentParser("A script to update generative config of the collections.")
     parser.add_argument("model_name", help="Name of the desired LLM model.")
+    parser.add_argument("collection", help="Name of the collection to update.", default="")
     args = parser.parse_args()
 
-    client = utils.connect_to_demo_db_goog()
+    client = utils.connect_to_my_db()
 
-    collections = client.collections.list_all()
-
-    for name, config in collections.items():
+    if args.collection != "":
+        collection_names = [args.collection]
+    else:
+        collections = client.collections.list_all()
+        collection_names = [name for name in collections.items()]
+    
+    for name in collection_names:
         try:
             coll = client.collections.get(name)
             coll.config.update(generative_config=Reconfigure.Generative.google_gemini(model=args.model_name))

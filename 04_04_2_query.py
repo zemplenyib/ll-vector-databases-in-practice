@@ -4,7 +4,7 @@ import json
 
 query = "how vector databases are different from relational databases"
 
-client = utils.connect_to_demo_db()  # Connect to the demo database
+client = utils.connect_to_my_db()  # Connect to the demo database
 
 wiki_chunks = client.collections.get(name="WikiChunk")
 

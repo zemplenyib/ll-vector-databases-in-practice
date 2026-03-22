@@ -10,5 +10,4 @@ def insert_in_batch(collection, objs, name: str):
         print(f"Insertion complete with {len(response.all_responses)} objects for '{name}' collection.")
         print(f"Insertion errors: {len(response.errors)}.")
 
-        if i + BATCH_SIZE < len(objs):
-            time.sleep(60)
+        time.sleep(60)
